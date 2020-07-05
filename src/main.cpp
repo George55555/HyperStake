@@ -2380,8 +2380,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock, std::string& strErr)
         uint256 hashProofOfStake = 0;
         if (fFullCheck && !CheckProofOfStake(pblock->vtx[1], pblock->nBits, hashProofOfStake)) {
 			printf("WARNING: ProcessBlock(): check proof-of-stake failed for block %s\n", hash.ToString().c_str());
-			if (fDebug)
-                            pblock->print();
+
+                // peershares: ask for missing blocks
+                if (pfrom)
+                pfrom->PushGetBlocks(pindexBest, pblock->GetHash());
+
 			return false;
         }
 
@@ -3361,7 +3364,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 printf("  got inventory: %s  %s\n", inv.ToString().c_str(), fAlreadyHave ? "have" : "new");
 
             if (!fAlreadyHave)
-                pfrom->AskFor(inv);
+                pfrom->AskFor(inv, IsInitialBlockDownload()); // peershares: immediate retry during initial download
             else if (inv.type == MSG_BLOCK && mapOrphanBlocks.count(inv.hash)) {
                 pfrom->PushGetBlocks(pindexBest, GetOrphanRoot(mapOrphanBlocks[inv.hash]));
             } else if (nInv == nLastBlock) {

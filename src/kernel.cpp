@@ -28,6 +28,8 @@ unsigned int getIntervalVersion(bool fTestNet)
 static std::map<int, unsigned int> mapStakeModifierCheckpoints =
     boost::assign::map_list_of
     (     0, 0xfd11f4e7u )
+	(  1000, 0x8c81a4cb )
+	( 50000, 0xc7aa4a1a )
 ;
 // Get time weight
 int64 GetWeight(int64 nIntervalBeginning, int64 nIntervalEnd)
